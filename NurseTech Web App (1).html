@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NurseTech – Soluciones Digitales para Enfermería</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        medical: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0a3651',
+                        },
+                        tealmed: {
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col pb-20 md:pb-0">
+
+    <!-- Encabezado Móvil / Escritorio -->
+    <header class="bg-gradient-to-r from-medical-800 to-medical-600 text-white sticky top-0 z-30 shadow-md">
+        <div class="max-w-md mx-auto md:max-w-5xl px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center text-tealmed-500 font-bold border border-white/20">
+                    <i class="fa-solid font-black fa-user-nurse text-xl text-teal-300"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide">NurseTech <span class="text-xs bg-teal-400 text-slate-900 font-semibold px-1.5 py-0.5 rounded ml-1">PRO</span></h1>
+                    <p class="text-xs text-medical-100">Gestión Clínica & Enfermería</p>
+                </div>
+            </div>
+            
+            <!-- Notificaciones y Perfil -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleAlertsModal()" class="relative p-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-white" aria-label="Notificaciones">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span id="badge-alerts" class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-medical-800"></span>
+                </button>
+                <div onclick="switchTab('perfil')" class="flex items-center space-x-2 border-l border-white/20 pl-3 ml-1 cursor-pointer hover:opacity-90">
+                    <div id="header-avatar" class="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center font-bold text-xs text-slate-900">
+                        EG
+                    </div>
+                    <span id="header-username" class="hidden md:inline text-xs font-medium">Enf. Elena Gómez</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal Dinámico -->
+    <main class="flex-1 max-w-md mx-auto md:max-w-5xl w-full p-4">
+
+        <!-- SECCIÓN 1: DASHBOARD -->
+        <section id="tab-dashboard" class="space-y-5 animate-fade-in">
+            <!-- Saludo al usuario -->
+            <div class="bg-gradient-to-br from-medical-700 via-medical-600 to-tealmed-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-white">
+                    <i class="fa-solid fa-notes-medical text-9xl"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span id="dash-shift-badge" class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium tracking-wide">Turno Actual: Mañana</span>
+                            <h2 class="text-xl font-bold mt-1" id="dash-greeting">¡Hola, Enf. Elena! 👋</h2>
+                            <p class="text-xs text-medical-100 mt-0.5" id="dash-role-area">Hospital General · Pediatría</p>
+                        </div>
+                        <span class="text-xs bg-emerald-500/80 backdrop-blur px-2.5 py-1 rounded-full text-white font-medium flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> Activo
+                        </span>
+                    </div>
+
+                    <!-- Métricas Rápidas -->
+                    <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/20 text-center">
+                        <div>
+                            <p class="text-xs text-medical-100">Próx. Turno</p>
+                            <p class="text-sm font-bold mt-0.5" id="dash-next-shift">Mañana 07:00</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-medical-100">Checklist</p>
+                            <p class="text-sm font-bold mt-0.5" id="dash-check-count">3/5 Listos</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-medical-100">Stock Crítico</p>
+                            <p class="text-sm font-bold mt-0.5 text-amber-200" id="dash-stock-alert">2 Items</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesos Rápidos -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 mb-2.5 flex items-center justify-between">
+                    <span>Módulos Principales</span>
+                    <span class="text-xs text-slate-400 font-normal">Acceso directo</span>
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <button onclick="switchTab('turnos')" class="p-3.5 bg-white rounded-xl shadow-sm border border-slate-200/80 hover:border-medical-500 flex flex-col items-start transition text-left group">
+                        <div class="w-9 h-9 rounded-lg bg-blue-50 text-medical-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-regular fa-calendar-days text-base"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Organizador Turnos</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Guardias y horas mes</span>
+                    </button>
+
+                    <button onclick="switchTab('calendario')" class="p-3.5 bg-white rounded-xl shadow-sm border border-slate-200/80 hover:border-medical-500 flex flex-col items-start transition text-left group">
+                        <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-calendar-check text-base"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Calendario</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Eventos y actividades</span>
+                    </button>
+
+                    <button onclick="switchTab('checklist')" class="p-3.5 bg-white rounded-xl shadow-sm border border-slate-200/80 hover:border-medical-500 flex flex-col items-start transition text-left group">
+                        <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-clipboard-check text-base"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Checklist Diario</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Procedimientos y med.</span>
+                    </button>
+
+                    <button onclick="switchTab('calc')" class="p-3.5 bg-white rounded-xl shadow-sm border border-slate-200/80 hover:border-medical-500 flex flex-col items-start transition text-left group">
+                        <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-calculator text-base"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Calc. de Dosis</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Goteo y soluciones</span>
+                    </button>
+
+                    <button onclick="switchTab('inventario')" class="p-3.5 bg-white rounded-xl shadow-sm border border-slate-200/80 hover:border-medical-500 flex flex-col items-start transition text-left group">
+                        <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-boxes-stacked text-base"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Inventario Insumos</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Control de stock</span>
+                    </button>
+
+                    <button onclick="switchTab('perfil')" class="p-3.5 bg-white rounded-xl shadow-sm border border-slate-200/80 hover:border-medical-500 flex flex-col items-start transition text-left group">
+                        <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-gear text-base"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Mi Perfil</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Ajustes y cuenta</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resumen Informativo de Alertas -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-amber-500"></i> Alertas y Recordatorios
+                    </h3>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded-full">2 Urgentes</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200/60 flex items-start justify-between">
+                        <div>
+                            <p class="font-semibold text-amber-900">Gasas Estériles en Stock Crítico</p>
+                            <p class="text-amber-700 mt-0.5">Quedan solo 8 paquetes en la estación 3.</p>
+                        </div>
+                        <button onclick="switchTab('inventario')" class="text-amber-800 font-bold underline whitespace-nowrap ml-2">Ver</button>
+                    </div>
+                    <div class="p-2.5 bg-blue-50 rounded-lg border border-blue-200/60 flex items-start justify-between">
+                        <div>
+                            <p class="font-semibold text-blue-900">Cambio de Vía - Cama 304</p>
+                            <p class="text-blue-700 mt-0.5">Programado para las 14:00 hrs.</p>
+                        </div>
+                        <button onclick="switchTab('checklist')" class="text-blue-800 font-bold underline whitespace-nowrap ml-2">Marcar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: ORGANIZADOR DE TURNOS -->
+        <section id="tab-turnos" class="space-y-4 hidden animate-fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Organizador de Turnos</h2>
+                    <p class="text-xs text-slate-500">Gestión de guardias y horas trabajadas</p>
+                </div>
+                <button onclick="openShiftModal()" class="bg-medical-600 hover:bg-medical-700 text-white text-xs px-3 py-2 rounded-lg font-medium shadow-sm flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-plus"></i> Añadir Guardias
+                </button>
+            </div>
+
+            <!-- Tarjeta Resumen Mensual -->
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-400 font-medium">Horas Acumuladas (Mes)</span>
+                    <div class="flex items-baseline space-x-1.5 mt-0.5">
+                        <span class="text-2xl font-bold text-medical-800" id="total-hours">132h</span>
+                        <span class="text-xs text-slate-500">/ 160h meta</span>
+                    </div>
+                </div>
+                <div class="w-1/3 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-medical-600 h-full rounded-full" style="width: 82%;"></div>
+                </div>
+            </div>
+
+            <!-- Lista de Turnos -->
+            <div class="space-y-2.5" id="shift-list">
+                <!-- Se llena con JS -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN NUEVA: CALENDARIO DE ACTIVIDADES -->
+        <section id="tab-calendario" class="space-y-4 hidden animate-fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Calendario de Actividades</h2>
+                    <p class="text-xs text-slate-500">Organización por fechas y eventos programados</p>
+                </div>
+                <button onclick="openCalendarModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg font-medium shadow-sm flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-plus"></i> Nuevo Evento
+                </button>
+            </div>
+
+            <!-- Header de Navegación del Mes -->
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <button onclick="changeMonth(-1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 id="calendar-month-year" class="font-bold text-slate-800 text-sm">Octubre 2026</h3>
+                    <button onclick="changeMonth(1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+
+                <!-- Días de la semana -->
+                <div class="grid grid-cols-7 text-center text-[11px] font-semibold text-slate-400">
+                    <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+                </div>
+
+                <!-- Rejilla de días -->
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center text-xs">
+                    <!-- Generado dinámicamente con JS -->
+                </div>
+            </div>
+
+            <!-- Leyenda de Categorías -->
+            <div class="flex flex-wrap items-center justify-around gap-2 bg-slate-100 p-2.5 rounded-xl text-[11px] text-slate-600">
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Turno</div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Capacitación</div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Recordatorio</div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Tarea</div>
+            </div>
+
+            <!-- Detalle de Actividades para la Fecha Seleccionada -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-day text-indigo-600"></i> Actividades del <span id="selected-date-label">Día</span>
+                    </h3>
+                    <span id="selected-date-count" class="text-[10px] bg-slate-100 font-semibold px-2 py-0.5 rounded-full text-slate-600">0 Eventos</span>
+                </div>
+
+                <div id="calendar-events-list" class="space-y-2">
+                    <!-- Eventos de la fecha seleccionada -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: CHECKLIST DIARIO -->
+        <section id="tab-checklist" class="space-y-4 hidden animate-fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Checklist de Procedimientos</h2>
+                    <p class="text-xs text-slate-500">Control rutinario e intervenciones del turno</p>
+                </div>
+                <span class="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full" id="checklist-progress-text">0% Completado</span>
+            </div>
+
+            <!-- Barra de progreso -->
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="checklist-progress-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%;"></div>
+            </div>
+
+            <!-- Agregar Tarea -->
+            <form onsubmit="addChecklistItem(event)" class="flex gap-2">
+                <input type="text" id="new-task-input" placeholder="Añadir nuevo procedimiento o paciente..." required class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-medical-500 bg-white">
+                <button type="submit" class="bg-medical-600 hover:bg-medical-700 text-white text-xs px-3.5 py-2.5 rounded-lg font-medium shadow-sm">
+                    Añadir
+                </button>
+            </form>
+
+            <!-- Grupos de Checklists -->
+            <div class="space-y-3" id="checklist-container">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: CALCULADORA MÉDICA DE DOSIS Y GOTEO -->
+        <section id="tab-calc" class="space-y-4 hidden animate-fade-in">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800">Calculadora de Gotero / Infusión</h2>
+                <p class="text-xs text-slate-500">Herramienta rápida de cálculo para administración de soluciones</p>
+            </div>
+
+            <!-- Selector de Modos -->
+            <div class="bg-white p-1 rounded-xl border border-slate-200 flex text-xs">
+                <button onclick="setCalcMode('goteo')" id="btn-mode-goteo" class="flex-1 py-2 rounded-lg font-semibold bg-medical-600 text-white shadow-sm text-center transition">
+                    Velocidad de Goteo
+                </button>
+                <button onclick="setCalcMode('dosis')" id="btn-mode-dosis" class="flex-1 py-2 rounded-lg font-medium text-slate-600 hover:text-slate-900 text-center transition">
+                    Dosis (mg/ml)
+                </button>
+            </div>
+
+            <!-- MODO GOTEO -->
+            <div id="calc-goteo-container" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3.5 shadow-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Volumen Solución (ml)</label>
+                    <input type="number" id="calc-volumen" placeholder="Ej: 500" value="500" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-medical-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tiempo de Infusión (Horas)</label>
+                    <input type="number" step="0.5" id="calc-tiempo" placeholder="Ej: 8" value="8" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-medical-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Normogotero / Pauta</label>
+                    <select id="calc-factor" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-medical-500 outline-none bg-white">
+                        <option value="20">Macrogotas (20 gotas/ml - Estándar Adulto)</option>
+                        <option value="60">Microgotas (60 gotas/ml - Pediatría)</option>
+                        <option value="10">Equipo Sanguíneo (10 gotas/ml)</option>
+                    </select>
+                </div>
+
+                <button onclick="calcularGoteo()" class="w-full bg-medical-600 hover:bg-medical-700 text-white font-semibold text-xs py-3 rounded-lg shadow-sm transition">
+                    Calcular Gotas por Minuto
+                </button>
+
+                <!-- Resultado -->
+                <div id="result-goteo" class="mt-3 p-3.5 bg-medical-50 border border-medical-200 rounded-xl text-center">
+                    <span class="text-xs text-medical-800 font-medium">Resultado Estimado:</span>
+                    <div class="text-2xl font-extrabold text-medical-800 my-0.5" id="res-gotas-min">21 Gotas / min</div>
+                    <p class="text-[11px] text-medical-600" id="res-gotas-micro">Equivalente a 63 Microgotas/min (o ml/h)</p>
+                </div>
+            </div>
+
+            <!-- MODO DOSIS -->
+            <div id="calc-dosis-container" class="bg-white p-4 rounded-xl border border-slate-200 space-y-3.5 shadow-sm hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Dosis Prescrita (mg)</label>
+                    <input type="number" id="calc-dosis-pres" placeholder="Ej: 250" value="250" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-medical-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Concentración Ampolla (mg)</label>
+                    <input type="number" id="calc-dosis-conc" placeholder="Ej: 500" value="500" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-medical-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Volumen Diluyente Ampolla (ml)</label>
+                    <input type="number" id="calc-dosis-vol" placeholder="Ej: 5" value="5" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-medical-500 outline-none">
+                </div>
+
+                <button onclick="calcularDosis()" class="w-full bg-medical-600 hover:bg-medical-700 text-white font-semibold text-xs py-3 rounded-lg shadow-sm transition">
+                    Calcular Volumen a Administrar
+                </button>
+
+                <div id="result-dosis" class="mt-3 p-3.5 bg-teal-50 border border-teal-200 rounded-xl text-center">
+                    <span class="text-xs text-teal-900 font-medium">Volumen a Inyectar / Administrar:</span>
+                    <div class="text-2xl font-extrabold text-teal-800 my-0.5" id="res-dosis-ml">2.5 ml</div>
+                    <p class="text-[11px] text-teal-600">Regla de 3 simple verificada</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: CONTROL DE INVENTARIO -->
+        <section id="tab-inventario" class="space-y-4 hidden animate-fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Inventario de Insumos</h2>
+                    <p class="text-xs text-slate-500">Control rápido de material en enfermería</p>
+                </div>
+                <button onclick="openInventoryModal()" class="bg-tealmed-500 hover:bg-tealmed-600 text-white text-xs px-3 py-2 rounded-lg font-medium shadow-sm flex items-center gap-1 transition">
+                    <i class="fa-solid fa-plus"></i> Nuevo Insumo
+                </button>
+            </div>
+
+            <!-- Filtros de búsqueda y estado -->
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar insumos (gasas, jeringas...)" class="w-full text-xs pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medical-500 bg-white">
+                </div>
+                <select id="filter-stock-status" onchange="filterInventory()" class="text-xs border border-slate-300 rounded-lg px-2 py-2 bg-white font-medium text-slate-700">
+                    <option value="all">Todos</option>
+                    <option value="low">Stock Bajo</option>
+                    <option value="ok">OK</option>
+                </select>
+            </div>
+
+            <!-- Lista de Productos -->
+            <div class="space-y-2.5" id="inventory-list">
+                <!-- Generado por JS -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN NUEVA: MI PERFIL Y CONFIGURACIÓN -->
+        <section id="tab-perfil" class="space-y-4 hidden animate-fade-in">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800">Mi Perfil Profesional</h2>
+                <p class="text-xs text-slate-500">Configuración de usuario e información institucional</p>
+            </div>
+
+            <!-- Card Resumen Perfil -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div id="profile-avatar-large" class="w-16 h-16 rounded-full bg-teal-500 text-slate-900 flex items-center justify-center font-bold text-xl ring-4 ring-teal-100">
+                    EG
+                </div>
+                <div>
+                    <h3 id="profile-display-name" class="font-bold text-base text-slate-800">Enf. Elena Gómez</h3>
+                    <p id="profile-display-role" class="text-xs text-slate-500">Enfermera Especialista en Pediatría</p>
+                    <span id="profile-display-license" class="inline-block mt-1 text-[10px] bg-medical-50 text-medical-700 font-semibold px-2 py-0.5 rounded border border-medical-200">
+                        Reg. M.P. 48291
+                    </span>
+                </div>
+            </div>
+
+            <!-- Formulario de Edición -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <form onsubmit="saveProfile(event)" class="space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre Completo</label>
+                        <input type="text" id="edit-profile-name" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-medical-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Cargo / Especialidad</label>
+                            <input type="text" id="edit-profile-role" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-medical-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Matrícula / Registro</label>
+                            <input type="text" id="edit-profile-license" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-medical-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Hospital / Área Trabajo</label>
+                        <input type="text" id="edit-profile-area" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-medical-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Turno Habitual</label>
+                        <select id="edit-profile-shift" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-medical-500 outline-none">
+                            <option value="Turno Mañana">Turno Mañana (07:00 - 15:00)</option>
+                            <option value="Turno Tarde">Turno Tarde (15:00 - 23:00)</option>
+                            <option value="Turno Noche">Turno Noche (23:00 - 07:00)</option>
+                            <option value="Guardias Rotativas">Guardias Rotativas</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Color / Avatar Iniciales</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="edit-profile-initials" maxlength="3" required class="w-16 text-center text-xs font-bold uppercase border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-medical-500 outline-none">
+                            <p class="text-[11px] text-slate-400">Hasta 3 letras para el avatar</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-medical-600 hover:bg-medical-700 text-white font-semibold text-xs py-3 rounded-lg shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios en Perfil
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Barra de Navegación Inferior Móvil / Menú -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-2 z-30 shadow-lg md:max-w-5xl md:mx-auto md:rounded-t-2xl">
+        <div class="max-w-md mx-auto flex justify-around items-center">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-medical-600 transition">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+                <span class="text-[9px] font-semibold">Inicio</span>
+            </button>
+            <button onclick="switchTab('turnos')" id="nav-turnos" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 transition">
+                <i class="fa-regular fa-calendar-days text-lg"></i>
+                <span class="text-[9px] font-medium">Turnos</span>
+            </button>
+            <button onclick="switchTab('calendario')" id="nav-calendario" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 transition">
+                <i class="fa-solid fa-calendar-check text-lg"></i>
+                <span class="text-[9px] font-medium">Calendario</span>
+            </button>
+            <button onclick="switchTab('checklist')" id="nav-checklist" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 transition">
+                <i class="fa-solid fa-clipboard-check text-lg"></i>
+                <span class="text-[9px] font-medium">Checklist</span>
+            </button>
+            <button onclick="switchTab('calc')" id="nav-calc" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 transition">
+                <i class="fa-solid fa-calculator text-lg"></i>
+                <span class="text-[9px] font-medium">Cálculos</span>
+            </button>
+            <button onclick="switchTab('inventario')" id="nav-inventario" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 transition">
+                <i class="fa-solid fa-boxes-stacked text-lg"></i>
+                <span class="text-[9px] font-medium">Insumos</span>
+            </button>
+            <button onclick="switchTab('perfil')" id="nav-perfil" class="flex flex-col items-center gap-1 text-slate-400 hover:text-medical-600 transition">
+                <i class="fa-solid fa-user-gear text-lg"></i>
+                <span class="text-[9px] font-medium">Perfil</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MODAL 1: AÑADIR TURNO -->
+    <div id="modal-shift" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl animate-fade-in">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-slate-800 text-sm">Registrar Nueva Guardia / Turno</h3>
+                <button onclick="closeShiftModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveNewShift(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Tipo de Turno</label>
+                    <select id="shift-type" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1 bg-white">
+                        <option value="Mañana (07:00 - 15:00)">Turno Mañana (8h)</option>
+                        <option value="Tarde (15:00 - 23:00)">Turno Tarde (8h)</option>
+                        <option value="Noche Guardia (23:00 - 07:00)">Turno Noche (12h)</option>
+                        <option value="Guardia 24h">Guardia Completa (24h)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Fecha</label>
+                    <input type="date" id="shift-date" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Área / Servicio</label>
+                    <input type="text" id="shift-area" placeholder="Ej: Pediatría, Urgencias..." value="Pediatría - Piso 3" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeShiftModal()" class="flex-1 py-2 text-xs border border-slate-300 text-slate-600 rounded-lg font-medium">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2 text-xs bg-medical-600 text-white rounded-lg font-medium shadow-sm">Guardar Turno</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO: AÑADIR EVENTO AL CALENDARIO -->
+    <div id="modal-calendar" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl animate-fade-in">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-slate-800 text-sm">Añadir Actividad al Calendario</h3>
+                <button onclick="closeCalendarModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveCalendarEvent(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Título del Evento</label>
+                    <input type="text" id="cal-title" placeholder="Ej: Capacitación de RCP, Entrega de guardia" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700">Fecha</label>
+                        <input type="date" id="cal-date" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700">Hora</label>
+                        <input type="time" id="cal-time" value="09:00" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Categoría</label>
+                    <select id="cal-category" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1 bg-white">
+                        <option value="Turno">Turno de Trabajo</option>
+                        <option value="Capacitación">Capacitación / Taller</option>
+                        <option value="Recordatorio">Recordatorio Clínico</option>
+                        <option value="Tarea">Tarea Pendiente</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Notas Adicionales</label>
+                    <textarea id="cal-notes" rows="2" placeholder="Opcional: Detalles del aula, paciente, etc." class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1"></textarea>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeCalendarModal()" class="flex-1 py-2 text-xs border border-slate-300 text-slate-600 rounded-lg font-medium">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2 text-xs bg-indigo-600 text-white rounded-lg font-medium shadow-sm">Guardar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: AÑADIR INSUMO -->
+    <div id="modal-inventory" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl animate-fade-in">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-slate-800 text-sm">Añadir Insumo a Inventario</h3>
+                <button onclick="closeInventoryModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveNewItem(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Nombre del Producto / Insumo</label>
+                    <input type="text" id="inv-name" placeholder="Ej: Termómetros Digitales" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700">Cantidad Actual</label>
+                        <input type="number" id="inv-stock" placeholder="10" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700">Mínimo Alerta</label>
+                        <input type="number" id="inv-min" placeholder="5" value="5" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Categoría</label>
+                    <select id="inv-cat" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 mt-1 bg-white">
+                        <option value="Descartables">Material Descartable</option>
+                        <option value="Equipos">Equipos Médicos</option>
+                        <option value="Soluciones">Soluciones / Sueros</option>
+                        <option value="Curación">Material Curativo</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeInventoryModal()" class="flex-1 py-2 text-xs border border-slate-300 text-slate-600 rounded-lg font-medium">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2 text-xs bg-tealmed-500 text-white rounded-lg font-medium shadow-sm">Registrar Insumo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ALERTAS GENERALES -->
+    <div id="modal-alerts" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-xl animate-fade-in">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                    <i class="fa-regular fa-bell text-medical-600"></i> Centro de Notificaciones
+                </h3>
+                <button onclick="toggleAlertsModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                    <p class="font-semibold text-slate-800">Recordatorio de Turno</p>
+                    <p class="text-slate-500 mt-0.5">Tienes asignada una guardia mañana a las 07:00 hrs en Pediatría.</p>
+                </div>
+                <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200">
+                    <p class="font-semibold text-amber-900">Insumos bajo límite</p>
+                    <p class="text-amber-700 mt-0.5">Gasas Estériles y Jeringas 5ml requieren reabastecimiento.</p>
+                </div>
+            </div>
+            <button onclick="toggleAlertsModal()" class="w-full py-2 text-xs bg-slate-100 text-slate-700 font-semibold rounded-lg mt-2">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // --- ESTADO GLOBAL Y LOCALSTORAGE ---
+        let profile = JSON.parse(localStorage.getItem('nursetech_profile')) || {
+            name: 'Enf. Elena Gómez',
+            role: 'Enfermera Especialista en Pediatría',
+            license: 'Reg. M.P. 48291',
+            area: 'Hospital General · Pediatría',
+            usualShift: 'Turno Mañana',
+            initials: 'EG'
+        };
+
+        let calendarEvents = JSON.parse(localStorage.getItem('nursetech_events')) || [
+            { id: 1, date: '2026-10-07', time: '07:00', title: 'Guardia Turno Mañana', category: 'Turno', notes: 'Servicio Pediatría - Cuerpos 301 a 310' },
+            { id: 2, date: '2026-10-07', time: '11:00', title: 'Taller de Vías Parenterales', category: 'Capacitación', notes: 'Auditorio Principal - Piso 1' },
+            { id: 3, date: '2026-10-08', time: '08:30', title: 'Revisión Carro de Paros', category: 'Tarea', notes: 'Verificar vencimiento de medicamentos' },
+            { id: 4, date: '2026-10-12', time: '10:00', title: 'Entrega Informe Mensual', category: 'Recordatorio', notes: 'Enviar a Jefatura de Enfermería' }
+        ];
+
+        let shifts = [
+            { id: 1, date: '2026-10-07', type: 'Mañana (07:00 - 15:00)', hours: 8, area: 'Pediatría - Piso 3', status: 'Próximo' },
+            { id: 2, date: '2026-10-08', type: 'Noche Guardia (23:00 - 07:00)', hours: 12, area: 'Pediatría - Piso 3', status: 'Próximo' },
+            { id: 3, date: '2026-10-10', type: 'Tarde (15:00 - 23:00)', hours: 8, area: 'Urgencias', status: 'Programado' }
+        ];
+
+        let checklists = [
+            { id: 1, text: 'Control signos vitales Cama 301 - 308', done: true, category: 'Rutina' },
+            { id: 2, text: 'Administración Antibiótico EV Cama 302 (10:00 AM)', done: true, category: 'Medicación' },
+            { id: 3, text: 'Cambio de Vía Periférica Cama 304', done: true, category: 'Procedimientos' },
+            { id: 4, text: 'Curación de herida quirúrgica Cama 306', done: false, category: 'Curaciones' },
+            { id: 5, text: 'Revisión y balance de líquidos en turno', done: false, category: 'Rutina' }
+        ];
+
+        let inventory = [
+            { id: 1, name: 'Termómetros Digitales', stock: 12, minStock: 5, category: 'Equipos', unit: 'unid.' },
+            { id: 2, name: 'Gasas Estériles 10x10', stock: 8, minStock: 25, category: 'Curación', unit: 'paq.' },
+            { id: 3, name: 'Jeringas 5ml descartables', stock: 18, minStock: 30, category: 'Descartables', unit: 'unid.' },
+            { id: 4, name: 'Solución Fisiológica 0.9% 500ml', stock: 24, minStock: 10, category: 'Soluciones', unit: 'frascos' },
+            { id: 5, name: 'Catéteres IV N° 20', stock: 15, minStock: 10, category: 'Descartables', unit: 'unid.' }
+        ];
+
+        // Calendario - Fecha seleccionada y navegación de mes
+        let currentDate = new Date();
+        let selectedCalendarDate = formatDateISO(new Date());
+
+        function formatDateISO(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // --- MANEJO DE PESTAÑAS ---
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'turnos', 'calendario', 'checklist', 'calc', 'inventario', 'perfil'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    if (nav) {
+                        nav.classList.add('text-medical-600');
+                        nav.classList.remove('text-slate-400');
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (nav) {
+                        nav.classList.remove('text-medical-600');
+                        nav.classList.add('text-slate-400');
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- ACTUALIZACIÓN Y SINCRONIZACIÓN DEL PERFIL EN VIVO ---
+        function updateProfileUI() {
+            // Header Top
+            document.getElementById('header-username').innerText = profile.name;
+            document.getElementById('header-avatar').innerText = profile.initials;
+
+            // Dashboard
+            document.getElementById('dash-greeting').innerText = `¡Hola, ${profile.name}! 👋`;
+            document.getElementById('dash-role-area').innerText = profile.area;
+            document.getElementById('dash-shift-badge').innerText = `Turno Actual: ${profile.usualShift}`;
+
+            // Perfil Tab
+            document.getElementById('profile-display-name').innerText = profile.name;
+            document.getElementById('profile-display-role').innerText = profile.role;
+            document.getElementById('profile-display-license').innerText = profile.license;
+            document.getElementById('profile-avatar-large').innerText = profile.initials;
+
+            // Inputs del Formulario
+            document.getElementById('edit-profile-name').value = profile.name;
+            document.getElementById('edit-profile-role').value = profile.role;
+            document.getElementById('edit-profile-license').value = profile.license;
+            document.getElementById('edit-profile-area').value = profile.area;
+            document.getElementById('edit-profile-shift').value = profile.usualShift;
+            document.getElementById('edit-profile-initials').value = profile.initials;
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+            profile = {
+                name: document.getElementById('edit-profile-name').value.trim(),
+                role: document.getElementById('edit-profile-role').value.trim(),
+                license: document.getElementById('edit-profile-license').value.trim(),
+                area: document.getElementById('edit-profile-area').value.trim(),
+                usualShift: document.getElementById('edit-profile-shift').value,
+                initials: document.getElementById('edit-profile-initials').value.trim().toUpperCase()
+            };
+
+            localStorage.setItem('nursetech_profile', JSON.stringify(profile));
+            updateProfileUI();
+
+            // Pequeña notificación visual
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> ¡Guardado con éxito!`;
+            btn.classList.replace('bg-medical-600', 'bg-emerald-600');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.replace('bg-emerald-600', 'bg-medical-600');
+            }, 1800);
+        }
+
+        // --- LÓGICA DEL CALENDARIO ---
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const monthYearText = document.getElementById('calendar-month-year');
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            monthYearText.innerText = `${monthNames[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Celdas vacías al inicio
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'py-2';
+                grid.appendChild(emptyCell);
+            }
+
+            // Días del mes
+            for (let day = 1; day <= totalDays; day++) {
+                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayCell = document.createElement('div');
+                
+                const isSelected = dateString === selectedCalendarDate;
+                const isToday = dateString === formatDateISO(new Date());
+
+                // Buscar eventos para este día
+                const dayEvents = calendarEvents.filter(e => e.date === dateString);
+
+                let dotBadges = '';
+                if (dayEvents.length > 0) {
+                    dotBadges = '<div class="flex justify-center gap-0.5 mt-1">';
+                    dayEvents.slice(0, 3).forEach(ev => {
+                        let colorClass = 'bg-blue-500';
+                        if (ev.category === 'Capacitación') colorClass = 'bg-purple-500';
+                        if (ev.category === 'Recordatorio') colorClass = 'bg-amber-500';
+                        if (ev.category === 'Tarea') colorClass = 'bg-emerald-500';
+                        dotBadges += `<span class="w-1.5 h-1.5 rounded-full ${colorClass}"></span>`;
+                    });
+                    dotBadges += '</div>';
+                }
+
+                dayCell.className = `py-2 rounded-xl cursor-pointer transition relative flex flex-col items-center justify-center ${isSelected ? 'bg-indigo-600 text-white font-bold shadow-md' : (isToday ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200' : 'hover:bg-slate-100 text-slate-700')}`;
+                dayCell.innerHTML = `<span>${day}</span>${dotBadges}`;
+                dayCell.onclick = () => selectCalendarDate(dateString);
+
+                grid.appendChild(dayCell);
+            }
+
+            renderDayEvents();
+        }
+
+        function selectCalendarDate(dateStr) {
+            selectedCalendarDate = dateStr;
+            renderCalendar();
+        }
+
+        function renderDayEvents() {
+            const eventsList = document.getElementById('calendar-events-list');
+            const label = document.getElementById('selected-date-label');
+            const countBadge = document.getElementById('selected-date-count');
+            
+            label.innerText = selectedCalendarDate;
+            eventsList.innerHTML = '';
+
+            const dayEvents = calendarEvents.filter(e => e.date === selectedCalendarDate);
+            countBadge.innerText = `${dayEvents.length} Eventos`;
+
+            if (dayEvents.length === 0) {
+                eventsList.innerHTML = `<p class="text-xs text-slate-400 text-center py-3">No hay actividades registradas para esta fecha.</p>`;
+                return;
+            }
+
+            dayEvents.forEach(ev => {
+                let badgeStyle = 'bg-blue-100 text-blue-800 border-blue-200';
+                if (ev.category === 'Capacitación') badgeStyle = 'bg-purple-100 text-purple-800 border-purple-200';
+                if (ev.category === 'Recordatorio') badgeStyle = 'bg-amber-100 text-amber-800 border-amber-200';
+                if (ev.category === 'Tarea') badgeStyle = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+
+                const card = document.createElement('div');
+                card.className = 'p-3 rounded-xl border border-slate-200 bg-slate-50/50 flex items-start justify-between gap-2';
+                card.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${badgeStyle}">${ev.category}</span>
+                            <span class="text-xs font-semibold text-slate-500"><i class="fa-regular fa-clock"></i> ${ev.time}</span>
+                        </div>
+                        <h4 class="font-bold text-xs text-slate-800 mt-1">${ev.title}</h4>
+                        ${ev.notes ? `<p class="text-[11px] text-slate-500 mt-0.5">${ev.notes}</p>` : ''}
+                    </div>
+                    <button onclick="deleteCalendarEvent(${ev.id})" class="text-slate-400 hover:text-rose-500 text-xs p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                eventsList.appendChild(card);
+            });
+        }
+
+        function openCalendarModal() {
+            document.getElementById('cal-date').value = selectedCalendarDate;
+            document.getElementById('modal-calendar').classList.remove('hidden');
+        }
+
+        function closeCalendarModal() {
+            document.getElementById('modal-calendar').classList.add('hidden');
+        }
+
+        function saveCalendarEvent(e) {
+            e.preventDefault();
+            const title = document.getElementById('cal-title').value.trim();
+            const date = document.getElementById('cal-date').value;
+            const time = document.getElementById('cal-time').value;
+            const category = document.getElementById('cal-category').value;
+            const notes = document.getElementById('cal-notes').value.trim();
+
+            calendarEvents.push({
+                id: Date.now(),
+                title,
+                date,
+                time,
+                category,
+                notes
+            });
+
+            localStorage.setItem('nursetech_events', JSON.stringify(calendarEvents));
+            closeCalendarModal();
+            selectedCalendarDate = date;
+            renderCalendar();
+        }
+
+        function deleteCalendarEvent(id) {
+            calendarEvents = calendarEvents.filter(e => e.id !== id);
+            localStorage.setItem('nursetech_events', JSON.stringify(calendarEvents));
+            renderCalendar();
+        }
+
+        // --- RENDERIZADO DE TURNOS ---
+        function renderShifts() {
+            const container = document.getElementById('shift-list');
+            container.innerHTML = '';
+
+            let totalH = 0;
+
+            shifts.forEach(s => {
+                totalH += s.hours;
+                const card = document.createElement('div');
+                card.className = 'bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between';
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-lg bg-medical-50 text-medical-600 flex flex-col items-center justify-center font-bold text-xs">
+                            <i class="fa-regular fa-clock"></i>
+                            <span class="text-[9px] mt-0.5">${s.hours}h</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-xs text-slate-800">${s.type}</h4>
+                            <p class="text-[11px] text-slate-500">${s.date} · ${s.area}</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-semibold px-2 py-1 rounded-full ${s.status === 'Próximo' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}">
+                        ${s.status}
+                    </span>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('total-hours').innerText = totalH + 'h';
+        }
+
+        // --- RENDERIZADO DE CHECKLIST ---
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+
+            let completed = 0;
+
+            checklists.forEach(item => {
+                if (item.done) completed++;
+
+                const row = document.createElement('div');
+                row.className = `p-3 rounded-xl border transition flex items-center justify-between cursor-pointer ${item.done ? 'bg-slate-50 border-slate-200 opacity-75' : 'bg-white border-slate-200 shadow-sm hover:border-medical-300'}`;
+                row.onclick = () => toggleCheckItem(item.id);
+
+                row.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-5 h-5 rounded border ${item.done ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 bg-white'} flex items-center justify-center text-xs transition">
+                            ${item.done ? '<i class="fa-solid fa-check"></i>' : ''}
+                        </div>
+                        <span class="text-xs ${item.done ? 'line-through text-slate-400' : 'font-medium text-slate-700'}">${item.text}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">${item.category}</span>
+                `;
+                container.appendChild(row);
+            });
+
+            const percent = checklists.length > 0 ? Math.round((completed / checklists.length) * 100) : 0;
+            document.getElementById('checklist-progress-bar').style.width = percent + '%';
+            document.getElementById('checklist-progress-text').innerText = percent + '% Completado';
+            document.getElementById('dash-check-count').innerText = `${completed}/${checklists.length} Listos`;
+        }
+
+        function toggleCheckItem(id) {
+            const item = checklists.find(c => c.id === id);
+            if (item) {
+                item.done = !item.done;
+                renderChecklist();
+            }
+        }
+
+        function addChecklistItem(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-task-input');
+            if (input.value.trim()) {
+                checklists.push({
+                    id: Date.now(),
+                    text: input.value.trim(),
+                    done: false,
+                    category: 'General'
+                });
+                input.value = '';
+                renderChecklist();
+            }
+        }
+
+        // --- CALCULADORA MÉDICA ---
+        function setCalcMode(mode) {
+            const goteoBox = document.getElementById('calc-goteo-container');
+            const dosisBox = document.getElementById('calc-dosis-container');
+            const btnGoteo = document.getElementById('btn-mode-goteo');
+            const btnDosis = document.getElementById('btn-mode-dosis');
+
+            if (mode === 'goteo') {
+                goteoBox.classList.remove('hidden');
+                dosisBox.classList.add('hidden');
+                btnGoteo.className = 'flex-1 py-2 rounded-lg font-semibold bg-medical-600 text-white shadow-sm text-center transition';
+                btnDosis.className = 'flex-1 py-2 rounded-lg font-medium text-slate-600 hover:text-slate-900 text-center transition';
+            } else {
+                goteoBox.classList.add('hidden');
+                dosisBox.classList.remove('hidden');
+                btnDosis.className = 'flex-1 py-2 rounded-lg font-semibold bg-medical-600 text-white shadow-sm text-center transition';
+                btnGoteo.className = 'flex-1 py-2 rounded-lg font-medium text-slate-600 hover:text-slate-900 text-center transition';
+            }
+        }
+
+        function calcularGoteo() {
+            const volumen = parseFloat(document.getElementById('calc-volumen').value) || 0;
+            const tiempo = parseFloat(document.getElementById('calc-tiempo').value) || 1;
+            const factor = parseFloat(document.getElementById('calc-factor').value) || 20;
+
+            const gotasMin = Math.round((volumen * factor) / (tiempo * 60));
+            const microgotasMin = Math.round((volumen * 60) / (tiempo * 60));
+
+            document.getElementById('res-gotas-min').innerText = `${gotasMin} Gotas / min`;
+            document.getElementById('res-gotas-micro').innerText = `Equivalente a ${microgotasMin} Microgotas/min (o ml/h)`;
+        }
+
+        function calcularDosis() {
+            const prescrita = parseFloat(document.getElementById('calc-dosis-pres').value) || 0;
+            const conc = parseFloat(document.getElementById('calc-dosis-conc').value) || 1;
+            const vol = parseFloat(document.getElementById('calc-dosis-vol').value) || 1;
+
+            const resultadoMl = ((prescrita * vol) / conc).toFixed(2);
+            document.getElementById('res-dosis-ml').innerText = `${resultadoMl} ml`;
+        }
+
+        // --- INVENTARIO DE INSUMOS ---
+        function renderInventory(filterText = '', filterStatus = 'all') {
+            const container = document.getElementById('inventory-list');
+            container.innerHTML = '';
+
+            let lowStockCount = 0;
+
+            const filtered = inventory.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(filterText.toLowerCase());
+                const isLow = item.stock <= item.minStock;
+                if (isLow) lowStockCount++;
+
+                if (filterStatus === 'low') return matchesSearch && isLow;
+                if (filterStatus === 'ok') return matchesSearch && !isLow;
+                return matchesSearch;
+            });
+
+            filtered.forEach(item => {
+                const isLow = item.stock <= item.minStock;
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-xl border bg-white shadow-sm flex items-center justify-between ${isLow ? 'border-amber-300 bg-amber-50/20' : 'border-slate-200'}`;
+                
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg ${isLow ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'} flex items-center justify-center text-sm font-bold">
+                            <i class="${isLow ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-box'}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-xs text-slate-800">${item.name}</h4>
+                            <p class="text-[11px] text-slate-400">${item.category} · Min: ${item.minStock} ${item.unit}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateStock(${item.id}, -1)" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition">-</button>
+                        <span class="text-xs font-bold w-10 text-center ${isLow ? 'text-amber-700 font-extrabold' : 'text-slate-800'}">${item.stock}</span>
+                        <button onclick="updateStock(${item.id}, 1)" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition">+</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('dash-stock-alert').innerText = `${lowStockCount} Items`;
+            document.getElementById('badge-alerts').style.display = lowStockCount > 0 ? 'block' : 'none';
+        }
+
+        function updateStock(id, change) {
+            const item = inventory.find(i => i.id === id);
+            if (item) {
+                item.stock = Math.max(0, item.stock + change);
+                filterInventory();
+            }
+        }
+
+        function filterInventory() {
+            const text = document.getElementById('search-inventory').value;
+            const status = document.getElementById('filter-stock-status').value;
+            renderInventory(text, status);
+        }
+
+        // --- MODALES AUXILIARES ---
+        function openShiftModal() {
+            document.getElementById('shift-date').valueAsDate = new Date();
+            document.getElementById('modal-shift').classList.remove('hidden');
+        }
+        function closeShiftModal() {
+            document.getElementById('modal-shift').classList.add('hidden');
+        }
+        function saveNewShift(e) {
+            e.preventDefault();
+            const type = document.getElementById('shift-type').value;
+            const date = document.getElementById('shift-date').value;
+            const area = document.getElementById('shift-area').value;
+            let hours = type.includes('24h') ? 24 : (type.includes('12h') || type.includes('Noche') ? 12 : 8);
+
+            shifts.push({ id: Date.now(), date, type, hours, area, status: 'Programado' });
+
+            // También registrar automáticamente en el calendario
+            calendarEvents.push({
+                id: Date.now() + 1,
+                date,
+                time: '07:00',
+                title: `Turno: ${type}`,
+                category: 'Turno',
+                notes: `Asignado en ${area}`
+            });
+
+            localStorage.setItem('nursetech_events', JSON.stringify(calendarEvents));
+            closeShiftModal();
+            renderShifts();
+            renderCalendar();
+        }
+
+        function openInventoryModal() {
+            document.getElementById('modal-inventory').classList.remove('hidden');
+        }
+        function closeInventoryModal() {
+            document.getElementById('modal-inventory').classList.add('hidden');
+        }
+        function saveNewItem(e) {
+            e.preventDefault();
+            const name = document.getElementById('inv-name').value;
+            const stock = parseInt(document.getElementById('inv-stock').value) || 0;
+            const minStock = parseInt(document.getElementById('inv-min').value) || 5;
+            const category = document.getElementById('inv-cat').value;
+
+            inventory.push({ id: Date.now(), name, stock, minStock, category, unit: 'unid.' });
+            closeInventoryModal();
+            filterInventory();
+        }
+
+        function toggleAlertsModal() {
+            document.getElementById('modal-alerts').classList.toggle('hidden');
+        }
+
+        // --- INICIAN COMPONENTES Y RENDERIZADO INICIAL ---
+        window.onload = function() {
+            updateProfileUI();
+            renderCalendar();
+            renderShifts();
+            renderChecklist();
+            renderInventory();
+            calcularGoteo();
+            calcularDosis();
+        };
+    </script>
+</body>
+</html>
